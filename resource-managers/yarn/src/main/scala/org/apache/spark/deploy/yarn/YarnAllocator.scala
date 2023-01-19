@@ -391,6 +391,10 @@ private[yarn] class YarnAllocator(
    * This must be synchronized because variables read in this method are mutated by other methods.
    */
   def allocateResources(): Unit = synchronized {
+    val stackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until stackTraceElements.length && i < 10) {
+      logInfo(stackTraceElements(i).getClassName + "." + stackTraceElements(i).getMethodName)
+    }
     updateResourceRequests()
 
     val progressIndicator = 0.1f

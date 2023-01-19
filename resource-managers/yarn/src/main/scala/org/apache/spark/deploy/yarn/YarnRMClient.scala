@@ -58,6 +58,10 @@ private[spark] class YarnRMClient extends Logging {
       sparkConf: SparkConf,
       uiAddress: Option[String],
       uiHistoryAddress: String): Unit = {
+    val StackTraceElements = Thread.currentThread().getStackTrace
+    for (i <- 0 until StackTraceElements.length && i<10) {
+      logInfo("register: " + StackTraceElements(i).getClassName + "." + StackTrace Elements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    }
     amClient = AMRMClient.createAMRMClient()
     amClient.init(conf)
     amClient.start()
@@ -82,6 +86,10 @@ private[spark] class YarnRMClient extends Logging {
       driverRef: RpcEndpointRef,
       securityMgr: SecurityManager,
       localResources: Map[String, LocalResource]): YarnAllocator = {
+    val StackTraceElements = Thread.currentThread().getStackTrace
+    for (i <- 0 until StackTraceElements.length && i<10) {
+      logInfo("createAllocator: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    }
     require(registered, "Must register AM before creating allocator.")
     new YarnAllocator(driverUrl, driverRef, conf, sparkConf, amClient, appAttemptId, securityMgr,
       localResources, SparkRackResolver.get(conf))
@@ -94,6 +102,10 @@ private[spark] class YarnRMClient extends Logging {
    * @param diagnostics Diagnostics message to include in the final status.
    */
   def unregister(status: FinalApplicationStatus, diagnostics: String = ""): Unit = synchronized {
+    val StackTraceElements = Thread.currentThread().getStackTrace
+    for (i <- 0 until StackTraceElements.length && i<10) {
+      logInfo("unregister: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    }
     if (registered) {
       amClient.unregisterApplicationMaster(status, diagnostics, uiHistoryAddress)
     }

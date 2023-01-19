@@ -83,6 +83,12 @@ private[yarn] class ExecutorRunnable(
   }
 
   def startContainer(): java.util.Map[String, ByteBuffer] = {
+    val StackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until StackTraceElements.length && i < 5) {
+      val StackTraceElement = StackTraceElements(i)
+      logInfo(stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + " at " +
+        stackTraceElement.getFileName() + ":" + stackTraceElement.getLineNumber())
+    }
     val ctx = Records.newRecord(classOf[ContainerLaunchContext])
       .asInstanceOf[ContainerLaunchContext]
     val env = prepareEnvironment().asJava
@@ -119,7 +125,7 @@ private[yarn] class ExecutorRunnable(
       ctx.setServiceData(Collections.singletonMap(serviceName, secretBytes))
     }
 
-    // Send the start request to the ContainerManager
+    // Send the start request to the  ContainerManager
     try {
       nmClient.startContainer(container.get, ctx)
     } catch {
