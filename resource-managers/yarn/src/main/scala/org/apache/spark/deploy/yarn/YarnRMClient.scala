@@ -58,9 +58,14 @@ private[spark] class YarnRMClient extends Logging {
       sparkConf: SparkConf,
       uiAddress: Option[String],
       uiHistoryAddress: String): Unit = {
-    val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length && i<10) {
-      logInfo("register: " + StackTraceElements(i).getClassName + "." + StackTrace Elements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    try {
+      throw new Exception("Tracing Register ApplicationMaster")
+    } catch {
+      case e: Exception =>
+        var stackTraceElements = e.getStackTrace
+        for (i <- 0 until stackTraceElements.length && i < 10) {
+          logInfo(stackTraceElements(i).getClassName + "." + stackTraceElements(i).getMethodName + " " + stackTraceElements(i).getLineNumber)
+        }
     }
     amClient = AMRMClient.createAMRMClient()
     amClient.init(conf)
