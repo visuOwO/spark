@@ -58,10 +58,14 @@ private[spark] class YarnRMClient extends Logging {
       sparkConf: SparkConf,
       uiAddress: Option[String],
       uiHistoryAddress: String): Unit = {
-    logInfo("Tracking register")
-    val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length.min(10)) {
-      logInfo("register: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    try {
+      throw new Exception("Tracing Register ApplicationMaster")
+    } catch {
+      case e: Exception =>
+        var stackTraceElements = e.getStackTrace
+        for (i <- 0 until stackTraceElements.length && i < 10) {
+          logInfo(stackTraceElements(i).getClassName + "." + stackTraceElements(i).getMethodName + " " + stackTraceElements(i).getLineNumber)
+        }
     }
     amClient = AMRMClient.createAMRMClient()
     amClient.init(conf)
@@ -87,9 +91,8 @@ private[spark] class YarnRMClient extends Logging {
       driverRef: RpcEndpointRef,
       securityMgr: SecurityManager,
       localResources: Map[String, LocalResource]): YarnAllocator = {
-    logInfo("Tracking createAllocator")
     val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length.min(10)) {
+    for (i <- 0 until StackTraceElements.length && i<10) {
       logInfo("createAllocator: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
     }
     require(registered, "Must register AM before creating allocator.")
@@ -104,9 +107,8 @@ private[spark] class YarnRMClient extends Logging {
    * @param diagnostics Diagnostics message to include in the final status.
    */
   def unregister(status: FinalApplicationStatus, diagnostics: String = ""): Unit = synchronized {
-    logInfo("Tracking Unregistering the ApplicationMaster")
     val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length.min(10) ){
+    for (i <- 0 until StackTraceElements.length && i<10) {
       logInfo("unregister: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
     }
     if (registered) {
