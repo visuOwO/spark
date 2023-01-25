@@ -161,6 +161,12 @@ private[spark] class ApplicationMaster(
    */
   private def prepareLocalResources(distCacheConf: SparkConf): Map[String, LocalResource] = {
     logInfo("Preparing Local resources")
+    val stackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until stackTraceElements.length.min(10)) {
+      logInfo(stackTraceElements(i).getClassName() + "." + stackTraceElements(i).getMethodName() +
+        " (" + stackTraceElements(i).getFileName() + ":" + stackTraceElements(i).getLineNumber() +
+        ")")
+    }
     val resources = HashMap[String, LocalResource]()
 
     def setupDistributedCache(

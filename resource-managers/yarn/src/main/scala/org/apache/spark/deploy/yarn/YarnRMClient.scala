@@ -58,14 +58,10 @@ private[spark] class YarnRMClient extends Logging {
       sparkConf: SparkConf,
       uiAddress: Option[String],
       uiHistoryAddress: String): Unit = {
-    try {
-      throw new Exception("Tracing Register ApplicationMaster")
-    } catch {
-      case e: Exception =>
-        var stackTraceElements = e.getStackTrace
-        for (i <- 0 until stackTraceElements.length && i < 10) {
-          logInfo(stackTraceElements(i).getClassName + "." + stackTraceElements(i).getMethodName + " " + stackTraceElements(i).getLineNumber)
-        }
+    logInfo("Tracking register")
+    val stackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until stackTraceElements.length.min(10)) {
+      logInfo(stackTraceElements(i).getClassName + "." + stackTraceElements(i).getMethodName + " " + stackTraceElements(i).getLineNumber)
     }
     amClient = AMRMClient.createAMRMClient()
     amClient.init(conf)
@@ -91,9 +87,12 @@ private[spark] class YarnRMClient extends Logging {
       driverRef: RpcEndpointRef,
       securityMgr: SecurityManager,
       localResources: Map[String, LocalResource]): YarnAllocator = {
-    val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length && i<10) {
-      logInfo("createAllocator: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    logInfo("Traking createAllocator")
+    val stackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until stackTraceElements.length.min(10)) {
+      logInfo(stackTraceElements(i).getClassName() + "." + stackTraceElements(i).getMethodName() +
+        " (" + stackTraceElements(i).getFileName() + ":" + stackTraceElements(i).getLineNumber() +
+        ")")
     }
     require(registered, "Must register AM before creating allocator.")
     new YarnAllocator(driverUrl, driverRef, conf, sparkConf, amClient, appAttemptId, securityMgr,
@@ -107,9 +106,12 @@ private[spark] class YarnRMClient extends Logging {
    * @param diagnostics Diagnostics message to include in the final status.
    */
   def unregister(status: FinalApplicationStatus, diagnostics: String = ""): Unit = synchronized {
-    val StackTraceElements = Thread.currentThread().getStackTrace
-    for (i <- 0 until StackTraceElements.length && i<10) {
-      logInfo("unregister: " + StackTraceElements(i).getClassName + "." + StackTraceElements(i).getMethodName + " " + StackTraceElements(i).getLineNumber)
+    logInfo("Unregistering the ApplicationMaster")
+    val stackTraceElements = Thread.currentThread().getStackTrace()
+    for (i <- 0 until stackTraceElements.length.min(10)) {
+      logInfo(stackTraceElements(i).getClassName() + "." + stackTraceElements(i).getMethodName() +
+        " (" + stackTraceElements(i).getFileName() + ":" + stackTraceElements(i).getLineNumber() +
+        ")")
     }
     if (registered) {
       amClient.unregisterApplicationMaster(status, diagnostics, uiHistoryAddress)
