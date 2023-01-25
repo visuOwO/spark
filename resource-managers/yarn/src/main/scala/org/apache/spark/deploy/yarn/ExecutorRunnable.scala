@@ -83,11 +83,11 @@ private[yarn] class ExecutorRunnable(
   }
 
   def startContainer(): java.util.Map[String, ByteBuffer] = {
+    logInfo("Starting container " + container.get.getId())
     val StackTraceElements = Thread.currentThread().getStackTrace()
-    for (i <- 0 until StackTraceElements.length && i < 5) {
-      val StackTraceElement = StackTraceElements(i)
-      logInfo(stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + " at " +
-        stackTraceElement.getFileName() + ":" + stackTraceElement.getLineNumber())
+    for (i <- 0 until StackTraceElements.length.min(10)) {
+      logInfo("Tracing Starging Container at:" + StackTraceElements(i).getClassName() + "." + StackTraceElements(i).getMethodName() + " at " +
+        StackTraceElements(i).getFileName() + ":" + StackTraceElements(i).getLineNumber())
     }
     val ctx = Records.newRecord(classOf[ContainerLaunchContext])
       .asInstanceOf[ContainerLaunchContext]
