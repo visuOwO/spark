@@ -184,9 +184,11 @@ private[spark] class Client(
    * available in the alpha API.
    */
   def submitApplication(): Unit = {
+    logInfo("Starting submit application to ResourceManager")
     ResourceRequestHelper.validateResources(sparkConf)
 
     try {
+      logDebug("satrt to create yarnClient")
       launcherBackend.connect()
       yarnClient.init(hadoopConf)
       yarnClient.start()
@@ -197,6 +199,7 @@ private[spark] class Client(
       }
 
       // Get a new application from our RM
+      logDebug("Creating a new application from resourcemanager.")
       val newApp = yarnClient.createApplication()
       val newAppResponse = newApp.getNewApplicationResponse()
       this.appId = newAppResponse.getApplicationId()
@@ -238,6 +241,7 @@ private[spark] class Client(
    * Cleanup application staging directory.
    */
   private def cleanupStagingDir(): Unit = {
+    logInfo(s"Deleting staging directory $stagingDirPath")
     if (sparkConf.get(PRESERVE_STAGING_FILES)) {
       return
     }
@@ -264,7 +268,7 @@ private[spark] class Client(
   def createApplicationSubmissionContext(
       newApp: YarnClientApplication,
       containerContext: ContainerLaunchContext): ApplicationSubmissionContext = {
-
+    logInfo("Setting up the submission context for our AM")
     val componentName = if (isClusterMode) {
       config.YARN_DRIVER_RESOURCE_TYPES_PREFIX
     } else {
@@ -344,6 +348,7 @@ private[spark] class Client(
    * along with whatever credentials the current user already has.
    */
   private def setupSecurityToken(amContainer: ContainerLaunchContext): Unit = {
+    logInfo("Setting up security tokens")
     val currentUser = UserGroupInformation.getCurrentUser()
     val credentials = currentUser.getCredentials()
 
@@ -546,6 +551,7 @@ private[spark] class Client(
         destName: Option[String] = None,
         targetDir: Option[String] = None,
         appMasterOnly: Boolean = false): (Boolean, String) = {
+      logInfo(s"Distributing $path")
       val trimmedPath = path.trim()
       val localURI = Utils.resolveURI(trimmedPath)
       if (localURI.getScheme != Utils.LOCAL_SCHEME) {
@@ -643,7 +649,7 @@ private[spark] class Client(
               localJars += jar
             }
           }
-
+          logDebug(s"Local jars to be distributed: $localJars")
           // Propagate the local URIs to the containers using the configuration.
           sparkConf.set(SPARK_JARS, localJars.toSeq)
 
@@ -1324,7 +1330,9 @@ private[spark] class Client(
    * throw an appropriate SparkException.
    */
   def run(): Unit = {
+    logInfo(s"Running Spark using the Yarn application submission client")
     submitApplication()
+    logInfo(s"Submitted application $appId")
     if (!launcherBackend.isConnected() && fireAndForget) {
       val report = getApplicationReport
       val state = report.getYarnApplicationState

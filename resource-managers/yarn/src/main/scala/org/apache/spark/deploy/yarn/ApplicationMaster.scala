@@ -412,6 +412,8 @@ private[spark] class ApplicationMaster(
           logDebug("shutting down user thread")
           userClassThread.interrupt()
         }
+      } else {
+        logInfo("Ignoring finish() as it is already finished")
       }
     }
   }
@@ -453,6 +455,7 @@ private[spark] class ApplicationMaster(
       rpcEnv: RpcEnv,
       appAttemptId: ApplicationAttemptId,
       distCacheConf: SparkConf): Unit = {
+    logInfo("Creating YarnAllocator for the AM")
     // In client mode, the AM may be restarting after delegation tokens have reached their TTL. So
     // always contact the driver to get the current set of valid tokens, so that local resources can
     // be initialized below.
@@ -548,6 +551,7 @@ private[spark] class ApplicationMaster(
   }
 
   private def runExecutorLauncher(): Unit = {
+    logInfo("Starting executor launcher.")
     val hostname = Utils.localHostName
     val amCores = sparkConf.get(AM_CORES)
     val rpcEnv = RpcEnv.create("sparkYarnAM", hostname, hostname, -1, sparkConf, securityMgr,
@@ -571,6 +575,7 @@ private[spark] class ApplicationMaster(
   }
 
   private def allocationThreadImpl(): Unit = {
+    logInfo("Starting the YARN application manager")
     // The number of failures in a row until the allocation thread gives up.
     val reporterMaxFailures = sparkConf.get(MAX_REPORTER_THREAD_FAILURES)
     var failureCount = 0
