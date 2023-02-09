@@ -202,7 +202,7 @@ private[yarn] class ExecutorRunnable(
         "FAST_PATH=0 MV2_USE_COALESCE=0 MV2_SUPPORT_DPM=1 " +
         "MV2_HOMOGENEOUS_CLUSTER=1 MV2_ENABLE_AFFINITY=0 " +
         "LD_PRELOAD=$MPILIB/    " +
-        "lib/libmpi.so " +)
+        "lib/libmpi.so ")
       Seq(Environment.JAVA_HOME.$$() + "/bin/java", "-server") ++
       javaOpts ++
       Seq("org.apache.spark.executor.YarnCoarseGrainedExecutorBackend",
