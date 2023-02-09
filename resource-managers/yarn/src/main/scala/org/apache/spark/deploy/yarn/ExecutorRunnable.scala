@@ -197,6 +197,12 @@ private[yarn] class ExecutorRunnable(
 
     YarnSparkHadoopUtil.addOutOfMemoryErrorArgument(javaOpts)
     val commands = prefixEnv ++
+      Seq("mpirun_rsh", "-np", "1", "-host", hostname, "-preload-binary") ++
+      Seq("SLURM_JOB_ID=$SLURM_JOB_ID MV2_RNDV_PROTOCOL=RGET MV2_USE_RDMA_    " +
+        "FAST_PATH=0 MV2_USE_COALESCE=0 MV2_SUPPORT_DPM=1 " +
+        "MV2_HOMOGENEOUS_CLUSTER=1 MV2_ENABLE_AFFINITY=0 " +
+        "LD_PRELOAD=$MPILIB/    " +
+        "lib/libmpi.so " +)
       Seq(Environment.JAVA_HOME.$$() + "/bin/java", "-server") ++
       javaOpts ++
       Seq("org.apache.spark.executor.YarnCoarseGrainedExecutorBackend",
@@ -206,6 +212,7 @@ private[yarn] class ExecutorRunnable(
         "--cores", executorCores.toString,
         "--app-id", appId,
         "--resourceProfileId", resourceProfileId.toString) ++
+        Seq("-cp $MV2J_HOME/lib/mvapich2-j.jar") ++
       Seq(
         s"1>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stdout",
         s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")
