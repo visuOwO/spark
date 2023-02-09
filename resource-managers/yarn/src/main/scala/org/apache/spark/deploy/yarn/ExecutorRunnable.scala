@@ -197,7 +197,7 @@ private[yarn] class ExecutorRunnable(
 
     YarnSparkHadoopUtil.addOutOfMemoryErrorArgument(javaOpts)
     val commands = prefixEnv ++
-      Seq("/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/bin/mpirun_rsh", "-np", "1", "-host ", "hostfile ") ++
+      Seq("/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/bin/mpirun_rsh", "-np", "1", "-host ", "/work2/09103/he2295/frontera/debug/spark/hostfile ") ++
       Seq("SLURM_JOB_ID=$SLURM_JOB_ID MV2_RNDV_PROTOCOL=RGET MV2_USE_RDMA_    " +
         "FAST_PATH=0 MV2_USE_COALESCE=0 MV2_SUPPORT_DPM=1 " +
         "MV2_HOMOGENEOUS_CLUSTER=1 MV2_ENABLE_AFFINITY=0 " +
