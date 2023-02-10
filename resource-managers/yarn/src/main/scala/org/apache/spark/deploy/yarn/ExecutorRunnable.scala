@@ -196,6 +196,11 @@ private[yarn] class ExecutorRunnable(
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" + ApplicationConstants.LOG_DIR_EXPANSION_VAR)
 
     YarnSparkHadoopUtil.addOutOfMemoryErrorArgument(javaOpts)
+
+
+
+
+
     val commands = prefixEnv ++
       Seq("/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/bin/mpirun_rsh", "-np", "1", "-host ", "/work2/09103/he2295/frontera/debug/spark/hostfile ") ++
       Seq("SLURM_JOB_ID=$SLURM_JOB_ID MV2_RNDV_PROTOCOL=RGET MV2_USE_RDMA_FAST_PATH=0 " +
@@ -216,9 +221,25 @@ private[yarn] class ExecutorRunnable(
       Seq(
         s"1>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stdout",
         s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")
-
+    val output_file = "/home1/09103/he2295/output_file"
+    val writer = new PrintWriter(output_file)
+    for (line <- commands) {
+      writer.write(line)
+    }
     // TODO: it would be nicer to just make sure there are no null commands here
-    commands.map(s => if (s == null) "null" else s).toList
+    // commands.map(s => if (s == null) "null" else s).toList
+
+    val filename = "/home1/09103/he2295/Command_filename"
+    var commandName = ""
+    for (line <- Source.fromFile(filename).getLines) {
+      commandName = commandName + line
+    }
+    var command = List[String]()
+    for (line <- Source.fromFile(commandName).getLines) {
+      command = command ++ line
+    }
+
+    command
   }
 
   private def prepareEnvironment(): HashMap[String, String] = {
