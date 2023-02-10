@@ -202,8 +202,8 @@ private[yarn] class ExecutorRunnable(
       Seq("SLURM_JOB_ID=$SLURM_JOB_ID MV2_RNDV_PROTOCOL=RGET MV2_USE_RDMA_FAST_PATH=0 " +
         "MV2_USE_COALESCE=0 MV2_SUPPORT_DPM=1 " +
         "MV2_HOMOGENEOUS_CLUSTER=1 MV2_ENABLE_AFFINITY=0 " +
-        "LD_PRELOAD=/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/lib/libmpi.so " +
-        "/opt/apps/gcc/8.3.0/lib64") ++
+        "LD_PRELOAD=/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/lib/libmpi.so "
+      ) ++
       Seq(Environment.JAVA_HOME.$$() + "/bin/java", "-server") ++
       javaOpts ++
       Seq("org.apache.spark.executor.YarnCoarseGrainedExecutorBackend",
