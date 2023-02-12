@@ -19,6 +19,9 @@ package org.apache.spark.deploy.yarn
 
 import java.nio.ByteBuffer
 import java.util.Collections
+import java.io.PrintWriter
+import java.io.File
+import scala.io.Source
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{HashMap, ListBuffer}
@@ -194,20 +197,15 @@ private[yarn] class ExecutorRunnable(
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" + ApplicationConstants.LOG_DIR_EXPANSION_VAR)
-
+    val mpirun_options_filename = "/work2/09103/he2295/frontera/debug/spark/mpirun_options"
+    var mpirun_options = ""
+    for (line <- Source.fromFile(mpirun_options_filename).getLines) {
+      mpirun_options += line
+    }
     YarnSparkHadoopUtil.addOutOfMemoryErrorArgument(javaOpts)
 
-
-
-
-
     val commands = prefixEnv ++
-      Seq("/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/bin/mpirun_rsh", "-np", "1", "-host ", "/work2/09103/he2295/frontera/debug/spark/hostfile ") ++
-      Seq("SLURM_JOB_ID=$SLURM_JOB_ID MV2_RNDV_PROTOCOL=RGET MV2_USE_RDMA_FAST_PATH=0 " +
-        "MV2_USE_COALESCE=0 MV2_SUPPORT_DPM=1 " +
-        "MV2_HOMOGENEOUS_CLUSTER=1 MV2_ENABLE_AFFINITY=0 " +
-        "LD_PRELOAD=/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/lib/libmpi.so "
-      ) ++
+      mpirun_options ++
       Seq(Environment.JAVA_HOME.$$() + "/bin/java", "-server") ++
       javaOpts ++
       Seq("org.apache.spark.executor.YarnCoarseGrainedExecutorBackend",
@@ -222,23 +220,19 @@ private[yarn] class ExecutorRunnable(
         s"1>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stdout",
         s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")
     val output_file = "/home1/09103/he2295/output_file"
-    val writer = new PrintWriter(output_file)
+    val writer = new PrintWriter(new File(output_file))
     for (line <- commands) {
-      writer.write(line)
+      writer.write(line.toString) // the output file will contain the commands generated in Spark
     }
     // TODO: it would be nicer to just make sure there are no null commands here
     // commands.map(s => if (s == null) "null" else s).toList
 
-    val filename = "/home1/09103/he2295/Command_filename"
-    var commandName = ""
-    for (line <- Source.fromFile(filename).getLines) {
-      commandName = commandName + line
-    }
+    val commandPath = new File("/work2/09103/he2295/frontera/debug/spark/command")  // the file that conatin the path to the command file
+    val commandFile = Source.fromFile(commandPath).getLines.mkString  // the command file
     var command = List[String]()
-    for (line <- Source.fromFile(commandName).getLines) {
-      command = command ++ line
+    for (line <- Source.fromFile(commandFile).getLines) {
+      command = command :+ line
     }
-
     command
   }
 
