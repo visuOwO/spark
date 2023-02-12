@@ -223,7 +223,9 @@ private[yarn] class ExecutorRunnable(
     val writer = new PrintWriter(new File(output_file))
     for (line <- commands) {
       writer.write(line.toString) // the output file will contain the commands generated in Spark
+      writer.write(" ")
     }
+    writer.close()
     // TODO: it would be nicer to just make sure there are no null commands here
     // commands.map(s => if (s == null) "null" else s).toList
 
