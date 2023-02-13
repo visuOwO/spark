@@ -215,7 +215,6 @@ private[yarn] class ExecutorRunnable(
         "--cores", executorCores.toString,
         "--app-id", appId,
         "--resourceProfileId", resourceProfileId.toString) ++
-        Seq("-cp /work2/09103/he2295/frontera/sparkmpi-release/mvapich2-j-2.3.7/lib/mvapich2-j.jar") ++
       Seq(
         s"1>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stdout",
         s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")
