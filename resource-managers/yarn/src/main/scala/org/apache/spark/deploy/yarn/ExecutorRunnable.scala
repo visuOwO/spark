@@ -243,7 +243,22 @@ private[yarn] class ExecutorRunnable(
 
     System.getenv().asScala
       .foreach { case (k, v) => env(k) = v }
-
+    env("LD_LIBRARY_PATH")= "/work2/09103/he2295/frontera/debug/hadoop/hadoop-dist/target/hadoop-3.2.2/lib/native:" +
+      "/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/lib:/opt/apps/hwloc/1.11.12/lib:/opt/apps/pmix/3.1.4/lib:" +
+      "/opt/apps/intel19/python3/3.7.0/lib:/opt/intel/    compilers_and_libraries_2020.4.304/linux/mpi/intel64/libfabric/lib:" +
+      "/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/lib/release:/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/lib:" +
+      "/opt/intel/debugger_2020/libipt/intel64/lib:/opt/intel/compilers_and_libraries_2020.1.217/linux/daal/lib/intel64_lin:" +
+      "/opt/intel/compilers_and_libraries_2020.1.217/linux/tbb/lib/intel64_lin/gcc4.8:" +
+      "/opt/intel/compilers_and_libraries_2020.1.217/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2020.1.217/linux/ipp/lib/intel64:" +
+      "/opt/intel/compilers_and_libraries_2020.1.217/linux/compiler/lib/intel64_lin:/opt/apps/gcc/8.3.0/lib64:" +
+      "/opt/apps/gcc/8.3.0/lib"
+    env("PATH") = "/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build/bin:/work2/09103/he2295/frontera/apache-maven/bin:" +
+      "/opt/apps/xalt/xalt/bin:/opt/apps/hwloc/1.11.12/bin:/opt/apps/pmix/3.1.4/bin:" +
+      "/opt/apps/cmake/3.24.2/bin:/opt/apps/intel19/python3/3.7.0/bin:/opt/apps/autotools/1.2/bin:" +
+      "/opt/apps/git/2.24.1/bin:/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/bin:" +
+      "/opt/intel/compilers_and_libraries_2020.1.217/linux/bin/intel64:/opt/apps/gcc/8.3.0/bin:/usr/lib64/qt-3.3/bin:" +
+      "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/ddn/ime/bin:.:/work2/09103/he2295/frontera/protobuf/bin"
+    env("MPILIB") = "/work2/09103/he2295/frontera/sparkmpi-release/mvapich2-build"
     sparkConf.getExecutorEnv.foreach { case (key, value) =>
       if (key == Environment.CLASSPATH.name()) {
         // If the key of env variable is CLASSPATH, we assume it is a path and append it.
