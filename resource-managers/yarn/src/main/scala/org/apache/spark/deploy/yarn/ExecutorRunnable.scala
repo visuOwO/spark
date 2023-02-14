@@ -197,6 +197,7 @@ private[yarn] class ExecutorRunnable(
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" + ApplicationConstants.LOG_DIR_EXPANSION_VAR)
+    javaOpts += ("-cp $CLASSPATH")
     val mpirun_options_filename = "/work2/09103/he2295/frontera/debug/spark/mpirun_options"
     val mpirun_options = Source.fromFile(mpirun_options_filename).getLines
 
